@@ -4,6 +4,9 @@
 #include <sstream>
 #include <filesystem>
 
+#include "help.hpp"
+#include "project.hpp"
+
 namespace fs = std::filesystem;
 
 using namespace std;
@@ -26,7 +29,7 @@ int main(int argc, char *argv[])
         }
 
         if(v[1] == "project") {
-        
+            _handle_project(v);
         }
 
         if(v[1] == "version") {
@@ -36,15 +39,7 @@ int main(int argc, char *argv[])
         } 
 
         if(v[1] == "help") {
-            if(v[2] == "build") {
-                cout << "usage: gent build <input>\n\nbuild compiles the source files you input.";
-            }
-            if(v[2] == "project") {
-                
-            }
-            if(v[2] == "version") {
-                cout << "usage: gent version\n\nList the version of the gentleman compiler.";
-            }
+            _handle_help(v);
         }
         
     }
