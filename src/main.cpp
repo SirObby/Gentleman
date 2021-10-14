@@ -30,8 +30,10 @@ int main(int argc, char *argv[])
         }
 
         if(v[1] == "version") {
-            
-        }
+            cout << "gent version 0.0.1 compiled on "
+            << __DATE__
+            << "\n";
+        } 
 
         if(v[1] == "help") {
             if(v[2] == "build") {
