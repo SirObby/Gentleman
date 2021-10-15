@@ -6,6 +6,7 @@
 
 #include "help.hpp"
 #include "project.hpp"
+#include "build.hpp"
 
 namespace fs = std::filesystem;
 
@@ -25,7 +26,7 @@ int main(int argc, char *argv[])
     {
 
         if(v[1] == "build") {
-
+            _handle_build(v);
         }
 
         if(v[1] == "project") {
