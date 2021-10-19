@@ -1,0 +1,25 @@
+/* stdio.h has printf, automatically included. */
+
+func int get_number() {
+    return 14;
+}
+
+func int main() {
+
+    printf("Hello World, Gentlemen.");
+
+    int x = 15; /* Set variable X to 15. */
+    int y; /* Will warn for being unused. */
+
+    if(x > get_number()) {
+        printf("Sounds like true is true");
+    } else {
+        printf("Sounds like true is false?");
+    }
+
+    if(!(x.null)) {
+        printf("Hi Sir, may I remind you X is not NULL?");
+    }
+
+    return 0;
+}

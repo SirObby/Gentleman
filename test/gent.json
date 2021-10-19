@@ -1,0 +1,14 @@
+{
+  "gent": {
+    "compile": "C",
+    "build_directory": "./build"
+  },
+  "projects": [
+    {
+      "name": "example",
+      "version": "0.0.1",
+      "source_files": "./src",
+      "has_libs": false
+    }
+  ]
+}

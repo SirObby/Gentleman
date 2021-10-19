@@ -1,2 +1,4 @@
 build
-dev-env
+test/build
+.vscode
+vsc_ext
