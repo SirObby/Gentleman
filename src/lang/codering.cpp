@@ -3,6 +3,7 @@
 #include <string>
 
 #include "codering.hpp"
+#include "std/base.hpp"
 
 using namespace std;
 
@@ -59,6 +60,13 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
                 handled = true;
                 cout << "\n"; // Debugging, makes unhandled pre_tokens look nicer.
             }
+
+            // Handling functions and running functions.
+            for (size_t i = 0; i < std_fn().size(); i++)
+            {
+                
+            }
+            
 
             if (!handled)
             {
