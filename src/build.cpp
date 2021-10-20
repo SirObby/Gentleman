@@ -35,7 +35,7 @@ void _handle_build(std::vector<std::string> v)
                     {
                         std::string line;
                         getline(o, line);
-                        code += line;
+                        code += line += "\n";
                         //cout << line << "\n";
                     }
                 }
@@ -44,7 +44,7 @@ void _handle_build(std::vector<std::string> v)
         }
     }
 
-    cout << code;
+    //cout << code;
     
     std::vector<Gentleman::Token> tokens =  _handle_codering(code);
 };

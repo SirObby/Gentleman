@@ -1,10 +1,10 @@
 /* stdio.h has printf, automatically included. */
 
-func int get_number() {
+func<int> get_number() {
     return 14;
 }
 
-func int main() {
+func<int> main() {
 
     printf("Hello World, Gentlemen.");
 
