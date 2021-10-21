@@ -3,6 +3,9 @@
 #include <iostream>
 #include <vector>
 
+#include "std/base.hpp"
+#include "std/lang_proc.hpp"
+
 namespace Gentleman
 {
 enum Token_Type{
@@ -29,8 +32,10 @@ class Token
 {
 private:
 public:
+    std::string name;
     Token_Type type;
     Token();
+    Gentleman::Function fn;
 };
 }
 

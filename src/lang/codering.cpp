@@ -4,6 +4,7 @@
 
 #include "codering.hpp"
 #include "std/base.hpp"
+#include "std/lang_proc.hpp"
 
 using namespace std;
 
@@ -15,8 +16,26 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
     {
         bool comment = false;
         bool string = false;
+        bool get_type = false;
+        bool get_args = false;
         Gentleman::Token current_token;
         std::string str;
+        std::string pre_token;
+        std::string lambda_code;
+        std::string argument_0;
+        std::string captured_type;
+        int argument_count = 0;
+
+        // What standard function are we running?
+        bool unknown_command = true;
+        bool external_command = false;
+
+        bool _func = false;
+
+        // What standard function arguments?
+
+        std::string _func_name = "";
+
     } lexer_stuff;
 
     for (int i = 0; i < c.size(); i++)
@@ -26,6 +45,17 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
 
         if (!(lexer_stuff.comment) && !(lexer_stuff.string))
         {
+
+            // Removing garbage.
+            std::string filtered_pre_token = "";
+
+            for (size_t i2 = 0; i2 < lexer_stuff.pre_token.size(); i2++)
+            {
+                if (!(lexer_stuff.pre_token[i2] == *"") && !(lexer_stuff.pre_token[i2] == *" "))
+                {
+                    filtered_pre_token += lexer_stuff.pre_token[i2];
+                }
+            }
 
             // Handling comments
             if (c[i] == *"/" && c[i + 1] == *"*")
@@ -43,7 +73,8 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
                 handled = true;
             }
 
-            if(c[i] == *"/" && c[i - 1] == *"*") {
+            if (c[i] == *"/" && c[i - 1] == *"*")
+            {
                 handled = true;
             }
 
@@ -61,16 +92,55 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
                 cout << "\n"; // Debugging, makes unhandled pre_tokens look nicer.
             }
 
-            // Handling functions and running functions.
-            for (size_t i = 0; i < std_fn().size(); i++)
+            // Capturing <type>
+
+            if (lexer_stuff.get_type && c[i] == *">")
             {
+                lexer_stuff.captured_type = filtered_pre_token;
+                lexer_stuff.pre_token = "";
+            }
+
+            if (c[i - 1] == *"<")
+            {
+                lexer_stuff.pre_token = "";
+                lexer_stuff.get_type = true;
+            }
+
+            // Capturing (arguments). 
+
+            if(c[i - 1] == *"(") {
+                lexer_stuff.pre_token = "";
+                lexer_stuff.get_args = true;
+                lexer_stuff.argument_count = 0;
+            }
+
+            if(c[i - 1] == *")") {
                 
             }
-            
+
+            /*
+            Handling functions and running functions.
+            Also, reading THIS part of the code, will make you insane.
+            */
+
+            if (filtered_pre_token == "func")
+            {
+                lexer_stuff._func = true;
+                lexer_stuff._func_name = "";
+            }
+
+            if(lexer_stuff._func) {
+                if(lexer_stuff.get_args && lexer_stuff._func_name == "") {
+                    lexer_stuff._func_name = filtered_pre_token;
+                    cout << "Function name: " <<  lexer_stuff._func_name << "\n";
+                }
+            }
 
             if (!handled)
             {
-                cout << c[i] << "  ";
+                lexer_stuff.pre_token += c[i];
+                cout << filtered_pre_token << "\n";
+                //cout << c[i];
             }
         }
         else
