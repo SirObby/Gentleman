@@ -1,25 +1,27 @@
 /* stdio.h has printf, automatically included. */
 
-func<int> get_number() {
-    return 14;
+int get_number = (/* Arguments */) {
+    return(14);
 }
 
-func<int> main() {
+int main = (/* Arguments */) {
 
-    printf("Hello World, Gentlemen.");
+    printf ("Hello World, Gentlemen.\n");
 
-    int x = 15; /* Set variable X to 15. */
-    int y; /* Will warn for being unused. */
+    int num = get_number ();
 
-    if(x > get_number()) {
-        printf("Sounds like true is true");
-    } else {
-        printf("Sounds like true is false?");
-    }
+    if (1 > num) -> printf ("1 is bigger than get_number\n")
+        -> {
+            printf ("Which is you know, very cool.\n");
+        };
 
-    if(!(x.null)) {
-        printf("Hi Sir, may I remind you X is not NULL?");
-    }
+    /*
+        Wait, how does this work?
+        if() executes (or doesn't) the then 'functions'. 
+        Which then can use the 'then' or '->' operator to run multiple functions.
+    */
+    
+    if(num.null) -> printf ("num has returned null, well this is awkward.\n");
 
-    return 0;
+    return(0);
 }

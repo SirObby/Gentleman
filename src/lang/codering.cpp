@@ -12,171 +12,105 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
 {
     std::vector<Gentleman::Token> gt;
 
-    struct lexer_stuff
+    typedef struct _lexer_token lexer_token;
+    struct _lexer_token
     {
-        bool comment = false;
-        bool string = false;
-        bool get_type = false;
-        bool get_args = false;
-        Gentleman::Token current_token;
-        std::string str;
-        std::string pre_token;
-        std::string lambda_code;
-        std::string argument_0;
-        std::string captured_type;
-        int argument_count = 0;
+        bool awaiting_eq = false; // Do we need an = sign?
 
-        // What standard function are we running?
-        bool unknown_command = true;
-        bool external_command = false;
+        bool start_bracket = false; // (
+        bool end_bracket = false;   // )
 
-        bool _func = false;
+        bool name_defined = false;
+        std::string name;
+        bool translated = false;                   // Has this been translated to C yet?
+        bool require_return_true_then = false;     // Does this function have to return true to execute then?
+        std::vector<lexer_token> then_tokens = {}; // Does anything have to be triggered after this?
+        std::string str_return_type = "";
+        Gentleman::Types return_type = Gentleman::Types::Void;
 
-        // What standard function arguments?
+        std::string c_code = ""; // This is generated during the parsing phase, or during lexing incase that is possible.
+    };
 
-        std::string _func_name = "";
-
-    } lexer_stuff;
-
-    for (int i = 0; i < c.size(); i++)
+    struct lexer
     {
+        bool started_defining = false; // Have we started defining something?
 
-        bool handled = false;
+        int functions = 0;
+        std::string fn_name = "";
+        lexer_token cur_tok;
+        std::vector<lexer_token> tokens = {};
 
-        if (!(lexer_stuff.comment) && !(lexer_stuff.string))
+        int ss_i = 0;
+        std::vector<std::string> space_split = {"/* EMPTY */"};
+        std::string _unspaced = ""; // Basically, joe.
+    } lexer;
+
+    for (size_t i = 0; i < c.size(); i++)
+    {
+        //printf(" %c ", c[i]);
+
+        if (c[i] != ' ' || c[i] != '\0')
         {
-
-            // Removing garbage.
-            std::string filtered_pre_token = "";
-
-            for (size_t i2 = 0; i2 < lexer_stuff.pre_token.size(); i2++)
-            {
-                if (!(lexer_stuff.pre_token[i2] == *"") && !(lexer_stuff.pre_token[i2] == *" "))
-                {
-                    filtered_pre_token += lexer_stuff.pre_token[i2];
-                }
-            }
-
-            // Handling comments
-            if (c[i] == *"/" && c[i + 1] == *"*")
-            {
-                lexer_stuff.current_token.type = Gentleman::Token_Type::COMMENT_BLOCK_START;
-                lexer_stuff.comment = true;
-                handled = true;
-
-                gt.push_back(lexer_stuff.current_token);
-                lexer_stuff.current_token = Gentleman::Token();
-            }
-
-            if (c[i] == *"*" && c[i - 1] == *"/")
-            {
-                handled = true;
-            }
-
-            if (c[i] == *"/" && c[i - 1] == *"*")
-            {
-                handled = true;
-            }
-
-            // Handling strings
-            if (c[i] == *"\"")
-            {
-                handled = true;
-                lexer_stuff.string = true;
-            }
-
-            // Handling newlines.
-            if (c[i] == *"\n")
-            { // Newlines do not affect tokenizing. They are "ignored", but "handled".
-                handled = true;
-                cout << "\n"; // Debugging, makes unhandled pre_tokens look nicer.
-            }
-
-            // Capturing <type>
-
-            if (lexer_stuff.get_type && c[i] == *">")
-            {
-                lexer_stuff.captured_type = filtered_pre_token;
-                lexer_stuff.pre_token = "";
-            }
-
-            if (c[i - 1] == *"<")
-            {
-                lexer_stuff.pre_token = "";
-                lexer_stuff.get_type = true;
-            }
-
-            // Capturing (arguments). 
-
-            if(c[i - 1] == *"(") {
-                lexer_stuff.pre_token = "";
-                lexer_stuff.get_args = true;
-                lexer_stuff.argument_count = 0;
-            }
-
-            if(c[i - 1] == *")") {
-                
-            }
-
-            /*
-            Handling functions and running functions.
-            Also, reading THIS part of the code, will make you insane.
-            */
-
-            if (filtered_pre_token == "func")
-            {
-                lexer_stuff._func = true;
-                lexer_stuff._func_name = "";
-            }
-
-            if(lexer_stuff._func) {
-                if(lexer_stuff.get_args && lexer_stuff._func_name == "") {
-                    lexer_stuff._func_name = filtered_pre_token;
-                    cout << "Function name: " <<  lexer_stuff._func_name << "\n";
-                }
-            }
-
-            if (!handled)
-            {
-                lexer_stuff.pre_token += c[i];
-                cout << filtered_pre_token << "\n";
-                //cout << c[i];
-            }
+            lexer._unspaced += c[i];
         }
-        else
+
+        if (c[i] == ' ')
         {
+            lexer.space_split.push_back(lexer._unspaced);
+            lexer._unspaced = "";
+            lexer.ss_i++;
+            //printf("-");
+        }
 
-            if (lexer_stuff.comment)
+        if (lexer.started_defining)
+        {
+            if (!(lexer.cur_tok.name_defined))
             {
-                if (c[i] == *"*" && c[i + 1] == *"/")
+                if (lexer.space_split[lexer.ss_i - 1] == "int")
                 {
-                    lexer_stuff.current_token.type = Gentleman::Token_Type::COMMENT_BLOCK_END;
-                    lexer_stuff.comment = false;
+                    lexer.cur_tok.str_return_type = "int";
+                    lexer.cur_tok.return_type = Gentleman::Types::Int;
+                    printf("int\n");
+                }
 
-                    gt.push_back(lexer_stuff.current_token);
-                    lexer_stuff.current_token = Gentleman::Token();
+                lexer.cur_tok.name = lexer.space_split[lexer.ss_i];
+                lexer.cur_tok.awaiting_eq = true;
+                cout << lexer.cur_tok.name;
+            }
+
+            if (lexer.cur_tok.awaiting_eq)
+            {
+                if (lexer.space_split[lexer.ss_i - 1] == "=")
+                {
+                    if (c[i] == '(')
+                    {
+                        lexer.cur_tok.awaiting_eq = false;
+                        lexer.cur_tok.start_bracket = true;
+                    }
                 }
             }
 
-            if (lexer_stuff.string)
+            if (lexer.cur_tok.start_bracket == true && lexer.cur_tok.end_bracket == false)
             {
-                if (c[i] == *"\"")
+                if (c[i] == ')')
                 {
-                    lexer_stuff.string = false;
-                }
-                else
-                {
-                    lexer_stuff.str += c[i];
+                    lexer.cur_tok.end_bracket = true;
+                    //printf("%s %s %d %d", lexer.cur_tok.str_return_type, lexer.cur_tok.name, lexer.cur_tok.start_bracket, lexer.cur_tok.end_bracket);
+                    cout << lexer.cur_tok.str_return_type << lexer.cur_tok.name << lexer.cur_tok.start_bracket << lexer.cur_tok.end_bracket;
                 }
             }
         }
 
-        /*if (!(handled))
+        if (lexer.space_split[lexer.ss_i] == "int")
         {
-            string m = "Sire, we have found that the following pre_token was not handled: " + c[i];
-            cout << m;
-            break;
-        }*/
+            if (!(lexer.started_defining))
+            {
+                lexer.started_defining = true;
+                lexer.functions++;
+            }
+        }
+
+        cout << lexer.space_split[lexer.ss_i];
     }
 
     return gt;

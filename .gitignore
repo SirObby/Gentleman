@@ -2,3 +2,4 @@ build
 test/build
 .vscode
 vsc_ext
+test/src/test.bat

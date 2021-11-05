@@ -13,7 +13,7 @@ void _handle_build(std::vector<std::string> v)
     bool output = false;
     std::string code = "";
 
-    for (size_t i = 0; i < v.size(); i++)
+    for (size_t i = 1; i < v.size(); i++)
     {
         if (!(output))
         {
