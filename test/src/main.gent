@@ -2,7 +2,7 @@
 
 int get_number = (/* Arguments */) {
     return(14);
-}
+};
 
 int main = (/* Arguments */) {
 
@@ -24,4 +24,4 @@ int main = (/* Arguments */) {
     if(num.null) -> printf ("num has returned null, well this is awkward.\n");
 
     return(0);
-}
+};

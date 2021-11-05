@@ -40,28 +40,48 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
         lexer_token cur_tok;
         std::vector<lexer_token> tokens = {};
 
+        int ss_i_o = 0;
         int ss_i = 0;
         std::vector<std::string> space_split = {"/* EMPTY */"};
         std::string _unspaced = ""; // Basically, joe.
+        bool go_out = false;
     } lexer;
 
     for (size_t i = 0; i < c.size(); i++)
     {
         //printf(" %c ", c[i]);
 
-        if (c[i] != ' ' || c[i] != '\0')
+        if (c[i] != ' ' /* || c[i] != '\0'*/)
         {
             lexer._unspaced += c[i];
         }
 
-        if (c[i] == ' ')
+        if (c[i] == ' ' || c[i] == '\t')
+        {
+            //cout << "\n>" << lexer._unspaced << "\n";
+            lexer.space_split.push_back(lexer._unspaced);
+            lexer._unspaced = "";
+            lexer.ss_i++;
+            lexer.go_out = true;
+        }
+
+        if (i == c.size() - 1)
         {
             lexer.space_split.push_back(lexer._unspaced);
             lexer._unspaced = "";
             lexer.ss_i++;
-            //printf("-");
+            lexer.go_out = true;
         }
 
+        if (lexer.ss_i != lexer.ss_i_o)
+        {
+            lexer.ss_i_o++;
+            cout << /*i <<*/ lexer.space_split[lexer.ss_i] << " ";
+        }
+    }
+
+    for (size_t i = 0; i < lexer.space_split.size(); i++)
+    {
         if (lexer.started_defining)
         {
             if (!(lexer.cur_tok.name_defined))
@@ -70,33 +90,38 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
                 {
                     lexer.cur_tok.str_return_type = "int";
                     lexer.cur_tok.return_type = Gentleman::Types::Int;
-                    printf("int\n");
+                    //printf("int\n");
                 }
 
                 lexer.cur_tok.name = lexer.space_split[lexer.ss_i];
                 lexer.cur_tok.awaiting_eq = true;
-                cout << lexer.cur_tok.name;
+                //cout << lexer.cur_tok.name;
             }
 
-            if (lexer.cur_tok.awaiting_eq)
+            for (size_t c_i = 0; c_i < lexer.space_split[i].size(); c_i++)
             {
-                if (lexer.space_split[lexer.ss_i - 1] == "=")
+                std::string element = lexer.space_split[i];
+
+                if (lexer.cur_tok.awaiting_eq)
                 {
-                    if (c[i] == '(')
+                    if (lexer.space_split[lexer.ss_i - 1] == "=")
                     {
-                        lexer.cur_tok.awaiting_eq = false;
-                        lexer.cur_tok.start_bracket = true;
+                        if (element[c_i] == '(')
+                        {
+                            lexer.cur_tok.awaiting_eq = false;
+                            lexer.cur_tok.start_bracket = true;
+                        }
                     }
                 }
-            }
 
-            if (lexer.cur_tok.start_bracket == true && lexer.cur_tok.end_bracket == false)
-            {
-                if (c[i] == ')')
+                if (lexer.cur_tok.start_bracket == true && lexer.cur_tok.end_bracket == false)
                 {
-                    lexer.cur_tok.end_bracket = true;
-                    //printf("%s %s %d %d", lexer.cur_tok.str_return_type, lexer.cur_tok.name, lexer.cur_tok.start_bracket, lexer.cur_tok.end_bracket);
-                    cout << lexer.cur_tok.str_return_type << lexer.cur_tok.name << lexer.cur_tok.start_bracket << lexer.cur_tok.end_bracket;
+                    if (element[c_i] == ')')
+                    {
+                        lexer.cur_tok.end_bracket = true;
+                        //printf("%s %s %d %d", lexer.cur_tok.str_return_type, lexer.cur_tok.name, lexer.cur_tok.start_bracket, lexer.cur_tok.end_bracket);
+                        cout << lexer.cur_tok.str_return_type << lexer.cur_tok.name << lexer.cur_tok.start_bracket << lexer.cur_tok.end_bracket << "\n";
+                    }
                 }
             }
         }
@@ -109,8 +134,6 @@ std::vector<Gentleman::Token> _handle_codering(std::string c)
                 lexer.functions++;
             }
         }
-
-        cout << lexer.space_split[lexer.ss_i];
     }
 
     return gt;
