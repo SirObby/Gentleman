@@ -1,10 +1,9 @@
 # Gentleman
-Gentleman is a low-level new programming language that is meant for Gentlemen. 
+Gentleman is a new low-level functional programming language. Which can be used to developer kernels, drivers and other low-level programs, but can also be used as a general purpose language.
 
 ## License
 Gentleman is licensed with TOP HAT License Version 1.\
 Please comply with the TOP HAT License in COPYING when using this software.
 
-## How does it work?
-It doesn't, it compiles into C, and then.. compiles the C using a compiler you have installed :>.\
-I'm too lazy to find out how to actually generate machine code, so C.
+## Documentation
+(not done)

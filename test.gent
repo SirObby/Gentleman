@@ -1,0 +1,6 @@
+( #include stdio )
+
+( fun main () {
+ (printf "Hello World!")
+ (return 0)
+} int )
