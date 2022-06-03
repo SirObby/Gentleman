@@ -8,3 +8,6 @@ gent: ${OBJS}
 
 obj/%.o: src/%.c
 	${CC} -c $< -o $@
+
+clean:
+	rm -f ${OBJS} gent
